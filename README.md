@@ -36,7 +36,6 @@ new_project_efficia/
 │           ├── dashboard.tsx   # Main dashboard component
 │           ├── DailySummary.tsx
 │           └── summary_chart.tsx
-├── pls_this_time_complete_kar_lena.ipynb  # Jupyter notebook
 └── README.md                    # This file
 ```
 
