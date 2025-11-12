@@ -55,5 +55,32 @@ app.add_middleware(
 @app.get("/activity", response_model=List[ActivityLog])
 def get_activities():
     with Session(engine) as session:
-        logs = session.query(ActivityLog).order_by(ActivityLog.timestamp.desc()).limit(100).all()
+        logs = session.query(ActivityLog).order_by(ActivityLog.timestamp.desc()).all()
         return logs
+
+
+from datetime import datetime, date
+from sqlmodel import select
+from db.models import ActivityLog
+from db.db import engine
+from typing import List
+
+@app.get("/daily-summary")
+def get_daily_summary():
+    today = date.today()
+    start_of_day = datetime(today.year, today.month, today.day)
+
+    with Session(engine) as session:
+        statement = select(ActivityLog).where(ActivityLog.timestamp >= start_of_day)
+        logs = session.exec(statement).all()
+
+        summary = {}
+        for log in logs:
+            app_name = log.app_name
+            duration = log.duration
+            summary[app_name] = summary.get(app_name, 0) + duration
+
+        return [
+            {"app_name": name, "total_time": total}
+            for name, total in summary.items()
+        ]
